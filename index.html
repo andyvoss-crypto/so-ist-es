@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infografik: Die Insolvenzbilanz unserer Zukunft</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #111827;
+            color: #F3F4F6;
+            scroll-behavior: smooth;
+        }
+        .accent-red { color: #F87171; }
+        .accent-green { color: #34D399; }
+        .accent-amber { color: #FBBF24; }
+        
+        .bg-accent-red { background-color: #F87171; }
+        .bg-accent-green { background-color: #34D399; }
+        .border-accent-red { border-color: #F87171; }
+        .border-accent-green { border-color: #34D399; }
+
+        .stat-card {
+            background-color: #1F2937;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            text-align: center;
+            border: 1px solid #374151;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(248, 113, 113, 0.3);
+            border-color: #F87171;
+        }
+        .stat-number {
+            font-size: 4rem;
+            font-weight: 900;
+            line-height: 1;
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover .stat-number {
+            transform: scale(1.1);
+        }
+        .flow-arrow {
+            font-size: 3rem;
+            line-height: 1;
+            text-align: center;
+            margin: 1.5rem 0;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 1rem;
+            letter-spacing: -0.05em;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease forwards;
+        }
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .section-subtitle {
+            font-size: 1.25rem;
+            text-align: center;
+            max-width: 48rem;
+            margin-left: auto;
+            margin-right: auto;
+            color: #D1D5DB;
+            margin-bottom: 3rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s ease 0.2s forwards;
+        }
+        .card {
+            background-color: #1F2937;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            border: 1px solid #374151;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease 0.4s forwards;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+        .phase-card {
+            background: linear-gradient(135deg, #1F2937 0%, #111827 100%);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            border: 1px solid #374151;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .phase-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(52, 211, 153, 0.1), transparent);
+            transition: left 0.8s;
+        }
+        .phase-card:hover::before {
+            left: 100%;
+        }
+        .phase-card:hover {
+            border-color: #34D399;
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(52, 211, 153, 0.2);
+        }
+        .interactive-number {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .interactive-number:hover {
+            color: #34D399;
+            text-shadow: 0 0 20px rgba(52, 211, 153, 0.5);
+        }
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease;
+        }
+        .reveal-on-scroll.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .pulse-glow {
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(52, 211, 153, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(52, 211, 153, 0.6); }
+        }
+        .typewriter {
+            overflow: hidden;
+            border-right: 3px solid #34D399;
+            white-space: nowrap;
+            animation: typewriter 3s steps(30) 1s forwards, blink 0.75s step-end infinite;
+            width: 0;
+        }
+        @keyframes typewriter {
+            to { width: 100%; }
+        }
+        @keyframes blink {
+            50% { border-color: transparent; }
+        }
+        .progress-bar {
+            height: 4px;
+            background: linear-gradient(90deg, #F87171, #FBBF24, #34D399);
+            position: fixed;
+            top: 0;
+            left: 0;
+            transform-origin: left;
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    
+    <header class="text-center py-16 px-4">
+        <h1 class="text-5xl md:text-7xl font-black tracking-tighter mb-4 typewriter">SO IST ES.</h1>
+        <p class="text-xl md:text-2xl text-gray-400 max-w-3xl mx-auto reveal-on-scroll">Die unbewusste Kette von der inneren Leere zur globalen Krise — und der einzige Weg hinaus.</p>
+    </header>
+
+    <main class="container mx-auto px-4">
+
+        <!-- Section 1: The Inner Deficit -->
+        <section class="my-16">
+            <h2 class="section-title"><span class="accent-red">1.</span> Das Defizit: Die psycho-emotionale Insolvenzbilanz</h2>
+            <p class="section-subtitle">Alles beginnt mit einer inneren Leere, die in der Kindheit durch unbewusste Erziehung entsteht. Ein Defizit an Selbstwert, das ein Leben lang nach Kompensation schreit.</p>
+            <div class="card max-w-3xl mx-auto text-center">
+                <h3 class="text-3xl font-bold mb-4">"Materialismus entsteht durch Leere."</h3>
+                <p class="text-gray-300">Wenn Selbstliebe fehlt, wird sie im Außen gesucht: durch Konsum, Status und digitale Ablenkung. Ein vergeblicher Versuch, eine innere Wunde mit äußeren Dingen zu füllen.</p>
+            </div>
+        </section>
+
+        <!-- Section 2: The Symptoms -->
+        <section class="my-16">
+            <h2 class="section-title"><span class="accent-red">2.</span> Die Symptome: Die sichtbaren Folgen der Leere</h2>
+            <p class="section-subtitle">Diese innere Insolvenz manifestiert sich in greifbaren, messbaren Krisen, die wir als individuelle oder gesellschaftliche Probleme fehlinterpretieren. In Wahrheit sind es Symptome derselben Ursache.</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="stat-card reveal-on-scroll" data-delay="0">
+                    <p class="text-lg font-semibold accent-red mb-2">Pathologischer Medienkonsum</p>
+                    <div class="stat-number accent-red interactive-number" data-target="600000">>0</div>
+                    <p class="text-gray-400 mt-2">Kinder & Jugendliche in DE. Die Sucht nach sozialer Anerkennung und Ablenkung füllt die Stille.</p>
+                </div>
+                <div class="stat-card reveal-on-scroll" data-delay="0.2">
+                    <p class="text-lg font-semibold accent-red mb-2">Vernachlässigung</p>
+                    <div class="stat-number accent-red interactive-number" data-target="58">0%</div>
+                    <p class="text-gray-400 mt-2">aller Kindeswohlgefährdungen. Emotionale Unerreichbarkeit der Eltern hinterlässt die tiefsten Wunden.</p>
+                </div>
+                <div class="stat-card reveal-on-scroll" data-delay="0.4">
+                    <p class="text-lg font-semibold accent-red mb-2">Fehlernährung & Adipositas</p>
+                    <div class="stat-number accent-red interactive-number" data-target="15.4">0%</div>
+                    <p class="text-gray-400 mt-2">der Kinder sind übergewichtig. Essen wird zur Kompensation, nicht zur Ernährung.</p>
+                </div>
+            </div>
+        </section>
+        
+        <div class="flow-arrow accent-red">▼</div>
+
+        <!-- Section 3: The Cost -->
+        <section class="my-16">
+            <h2 class="section-title"><span class="accent-red">3.</span> Die Rechnung: Die unbezahlbaren Kosten der Unbewusstheit</h2>
+            <p class="section-subtitle">Die Summe der individuellen Defizite erzeugt eine kollektive Katastrophe. Wir zahlen den Preis — finanziell, sozial und ökologisch.</p>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="card lg:col-span-2">
+                    <h3 class="text-2xl font-bold accent-red mb-4">Finanzielle Kosten: Das System am Limit</h3>
+                    <p class="text-gray-400 mb-4">Ein Großteil der GKV-Ausgaben fließt in die Behandlung chronischer Krankheiten, die die späten Folgen frühkindlicher emotionaler Defizite sind.</p>
+                    <div class="h-64 md:h-80 relative">
+                        <canvas id="costChart"></canvas>
+                    </div>
+                </div>
+                <div class="card space-y-6">
+                     <div>
+                        <h3 class="text-2xl font-bold accent-red mb-2">Soziale Kosten</h3>
+                        <p class="text-gray-400">Verlust kollektiver Weisheit, politische Spaltung und eine Gesellschaft, die anfällig für Populismus ist, weil sie nach einfachen Antworten auf komplexe Ängste sucht.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold accent-red mb-2">Ökologische Kosten</h3>
+                        <p class="text-gray-400">Eine konsumgetriebene Gesellschaft agiert wie ein <span class="font-bold">"Parasit"</span>. Die Klimakrise des Anthropozäns ist die ultimative Externalisierung unserer inneren Leere.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="h-1 w-24 bg-accent-green mx-auto my-16 rounded-full"></div>
+
+        <!-- Section 4: The Investment -->
+        <section class="my-16">
+            <h2 class="section-title"><span class="accent-green">4.</span> Die Lösung: Die einzig rentable Investition</h2>
+            <p class="section-subtitle">Die Kette kann durchbrochen werden. Die Lösung ist keine Technologie oder Politik, sondern ein fundamentaler Wandel im menschlichen Bewusstsein, der im Kinderzimmer beginnt.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div class="card text-center">
+                     <h3 class="text-2xl font-bold accent-green mb-4">Bewusste Elternschaft</h3>
+                     <p class="text-gray-300 text-lg">Die aktive Entscheidung, die eigenen Wunden zu heilen, um dem Kind emotionale Sicherheit, Empathie und Selbstliebe zu schenken.</p>
+                </div>
+                <div class="stat-card border-accent-green border-2 pulse-glow">
+                    <p class="text-xl font-semibold accent-amber mb-2">Return on Investment</p>
+                    <div class="stat-number accent-amber interactive-number" data-target="16">1:0</div>
+                    <p class="text-gray-400 mt-2">Jeder Euro, der in frühkindliche Förderung investiert wird, spart der Gesellschaft bis zu 16 Euro an Folgekosten. (James Heckman, Nobelpreisträger)</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: International Comparison -->
+        <section class="my-16">
+            <h2 class="section-title"><span class="accent-amber">5.</span> Der internationale Vergleich: Wer zahlt den höchsten Preis?</h2>
+            <p class="section-subtitle">Die Kosten der Unbewusstheit variieren global. Länder mit bewussten Bildungs- und Familiensystemen zeigen dramatisch bessere Ergebnisse.</p>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="card">
+                    <h3 class="text-2xl font-bold accent-red mb-4">Deutschland: Die Krise</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between">
+                            <span>Kinderarmut:</span>
+                            <span class="accent-red font-bold">21,3%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Chronische Krankheiten (Kosten):</span>
+                            <span class="accent-red font-bold">290 Mrd. €</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Mediensucht (Jugendliche):</span>
+                            <span class="accent-red font-bold">7,6%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Lebenszufriedenheit (Rang):</span>
+                            <span class="accent-red font-bold">#17 weltweit</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card border-accent-green border-2">
+                    <h3 class="text-2xl font-bold accent-green mb-4">Finnland: Das Vorbild</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between">
+                            <span>Kinderarmut:</span>
+                            <span class="accent-green font-bold">4,3%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Bildung (PISA-Rang):</span>
+                            <span class="accent-green font-bold">#1 weltweit</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Elternzeit:</span>
+                            <span class="accent-green font-bold">164 Tage</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Lebenszufriedenheit (Rang):</span>
+                            <span class="accent-green font-bold">#1 weltweit</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: Implementation Strategy -->
+        <section class="my-16">
+            <h2 class="section-title"><span class="accent-green">6.</span> Der Umsetzungsplan: Konkrete Schritte aus der Krise</h2>
+            <p class="section-subtitle">Bewusste Elternschaft ist messbar und lehrbar. Diese Strategie könnte Deutschland innerhalb einer Generation transformieren.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                <div class="phase-card text-center reveal-on-scroll" data-delay="0">
+                    <div class="text-4xl font-black accent-green mb-2 interactive-number">Phase 1</div>
+                    <h3 class="text-lg font-bold mb-2">Bewusstseinsbildung</h3>
+                    <p class="text-gray-400 text-sm">Aufklärung über die wahren Kosten unbewusster Erziehung in Medien und Politik</p>
+                </div>
+                <div class="phase-card text-center reveal-on-scroll" data-delay="0.2">
+                    <div class="text-4xl font-black accent-green mb-2 interactive-number">Phase 2</div>
+                    <h3 class="text-lg font-bold mb-2">Systemreform</h3>
+                    <p class="text-gray-400 text-sm">Elternzeitreform, Kita-Qualität, verpflichtende Elternkurse</p>
+                </div>
+                <div class="phase-card text-center reveal-on-scroll" data-delay="0.4">
+                    <div class="text-4xl font-black accent-green mb-2 interactive-number">Phase 3</div>
+                    <h3 class="text-lg font-bold mb-2">Finanzanreize</h3>
+                    <p class="text-gray-400 text-sm">GKV-Boni für bewusste Elternschaft, Investition in Prävention</p>
+                </div>
+                <div class="phase-card text-center reveal-on-scroll" data-delay="0.6">
+                    <div class="text-4xl font-black accent-green mb-2 interactive-number">Phase 4</div>
+                    <h3 class="text-lg font-bold mb-2">Kulturwandel</h3>
+                    <p class="text-gray-400 text-sm">Neue Generation wächst bewusst auf - Kipppunkt erreicht</p>
+                </div>
+            </div>
+
+            <div class="card max-w-4xl mx-auto">
+                <h3 class="text-2xl font-bold accent-green mb-4 text-center">Kosten vs. Nutzen: Der Business Case</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="text-xl font-bold accent-red mb-3">Investition (einmalig):</h4>
+                        <ul class="space-y-2 text-gray-300">
+                            <li>• Elternbildung: 2 Mrd. €/Jahr</li>
+                            <li>• Kitaqualität: 5 Mrd. €/Jahr</li>
+                            <li>• Elternzeit: 3 Mrd. €/Jahr</li>
+                            <li><strong>Gesamt: 10 Mrd. €/Jahr</strong></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-bold accent-green mb-3">Einsparung (langfristig):</h4>
+                        <ul class="space-y-2 text-gray-300">
+                            <li>• Gesundheitskosten: -100 Mrd. €/Jahr</li>
+                            <li>• Jugendhilfe: -15 Mrd. €/Jahr</li>
+                            <li>• Kriminalität: -20 Mrd. €/Jahr</li>
+                            <li><strong>Gesamt: >135 Mrd. €/Jahr</strong></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="text-center mt-6 p-4 bg-green-900/30 rounded-lg">
+                    <p class="text-2xl font-bold accent-green">ROI: 1350% innerhalb von 20 Jahren</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 7: The Transformation -->
+        <section class="my-16">
+             <h2 class="section-title"><span class="accent-green">7.</span> Die Transformation: Vom Parasiten zum Hüter</h2>
+             <p class="section-subtitle">Bewusste Erziehung ist keine private Angelegenheit. Sie ist der Motor für den systemischen Wandel, der unsere Zivilisation überlebensfähig macht.</p>
+            <div class="card max-w-4xl mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-3 items-center text-center">
+                    <div>
+                        <h3 class="text-xl font-bold accent-green">Bewusster, resilienter Mensch</h3>
+                        <p class="text-gray-400">Individuen mit hohem Selbstwert und Empathie.</p>
+                    </div>
+                    <div class="flow-arrow accent-green transform md:rotate-[-90deg]">→</div>
+                     <div>
+                        <h3 class="text-xl font-bold accent-green">Kollektive Weisheit</h3>
+                        <p class="text-gray-400">Eine Gesellschaft, die kooperiert und langfristig denkt.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flow-arrow accent-green">▼</div>
+            <div class="card max-w-xl mx-auto text-center border-accent-green border-2">
+                 <h3 class="text-4xl font-black tracking-tighter accent-green">Eine lebenswerte Zukunft</h3>
+                 <p class="text-gray-300 mt-2">Eine Menschheit, die als "Hüter" des Planeten agiert.</p>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="text-center py-12 mt-16 px-4 border-t border-gray-700">
+        <h3 class="text-3xl font-bold mb-4">Die Revolution beginnt nicht auf der Straße.</h3>
+        <p class="text-4xl font-black tracking-tighter accent-green">Sie beginnt im Kinderzimmer.</p>
+        <div class="mt-8 text-gray-500">
+            <p>Eine Synthese von Andy Voß</p>
+            <p>andyvoss@protonmail.com | 0172/4612583</p>
+        </div>
+    </footer>
+
+    <script>
+        // Progress Bar
+        const progressBar = document.getElementById('progressBar');
+        window.addEventListener('scroll', () => {
+            const scrollProgress = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+            progressBar.style.transform = `scaleX(${scrollProgress})`;
+        });
+
+        // Scroll Reveal Animation
+        const revealElements = document.querySelectorAll('.reveal-on-scroll');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const delay = entry.target.dataset.delay || 0;
+                    setTimeout(() => {
+                        entry.target.classList.add('revealed');
+                    }, delay * 1000);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        revealElements.forEach(el => observer.observe(el));
+
+        // Number Animation
+        function animateNumber(element, target, isPercentage = false, hasPrefix = false) {
+            let current = 0;
+            const increment = target / 100;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                
+                if (hasPrefix && target >= 600000) {
+                    element.textContent = `>${Math.floor(current).toLocaleString()}`;
+                } else if (isPercentage) {
+                    element.textContent = `${current.toFixed(1)}%`;
+                } else if (target === 16) {
+                    element.textContent = `1:${Math.floor(current)}`;
+                } else {
+                    element.textContent = Math.floor(current).toLocaleString();
+                }
+            }, 20);
+        }
+
+        // Interactive Numbers
+        const interactiveNumbers = document.querySelectorAll('.interactive-number[data-target]');
+        interactiveNumbers.forEach(el => {
+            el.addEventListener('click', () => {
+                const target = parseFloat(el.dataset.target);
+                const isPercentage = el.textContent.includes('%');
+                const hasPrefix = el.textContent.includes('>');
+                animateNumber(el, target, isPercentage, hasPrefix);
+            });
+        });
+
+        // Auto-animate numbers when they come into view
+        const numberObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !entry.target.classList.contains('animated')) {
+                    entry.target.classList.add('animated');
+                    const target = parseFloat(entry.target.dataset.target);
+                    const isPercentage = entry.target.textContent.includes('%');
+                    const hasPrefix = entry.target.textContent.includes('>');
+                    
+                    setTimeout(() => {
+                        animateNumber(entry.target, target, isPercentage, hasPrefix);
+                    }, 500);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        interactiveNumbers.forEach(el => numberObserver.observe(el));
+
+        // Chart.js Configuration
+        document.addEventListener('DOMContentLoaded', () => {
+            const costChartCtx = document.getElementById('costChart').getContext('2d');
+            new Chart(costChartCtx, {
+                type: 'line',
+                data: {
+                    labels: ['2005', '2010', '2015', '2020', '2025 (Prognose)'],
+                    datasets: [{
+                        label: 'Kosten für chron. Krankheiten (GKV)',
+                        data: [180, 210, 250, 290, 340],
+                        borderColor: '#F87171',
+                        backgroundColor: 'rgba(248, 113, 113, 0.2)',
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#F87171',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeInOutQuart'
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: '#1F2937',
+                            titleColor: '#F3F4F6',
+                            bodyColor: '#F3F4F6',
+                            borderColor: '#F87171',
+                            borderWidth: 1
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: { 
+                                color: '#9CA3AF',
+                                callback: function(value) {
+                                    return value + ' Mrd. €';
+                                }
+                            },
+                            grid: {
+                                color: '#374151'
+                            }
+                        },
+                        x: {
+                            ticks: { 
+                                color: '#9CA3AF'
+                            },
+                             grid: {
+                                color: '#374151'
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    }
+                }
+            });
+        });
+
+        // Smooth scroll for internal links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add particle effect on hover for cards
+        document.querySelectorAll('.stat-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.background = 'linear-gradient(135deg, #1F2937 0%, #374151 50%, #1F2937 100%)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.background = '#1F2937';
+            });
+        });
+    </script>
+</body>
+</html>
